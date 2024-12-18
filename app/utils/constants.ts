@@ -430,8 +430,8 @@ async function getOllamaModels(apiKeys?: Record<string, string>, settings?: IPro
       maxTokenAllowed: 8000,
     }));
   } catch (e: any) {
-    logStore.logError('Échec de la récupération des modèles Ollama', e, { baseUrl: settings?.baseUrl });
-    logger.warn('Échec de la récupération des modèles Ollama : ', e.message || '');
+    logStore.logError('Failed to get Ollama models', e, { baseUrl: settings?.baseUrl });
+    logger.warn('Failed to get Ollama models: ', e.message || '');
 
     return [];
   }
