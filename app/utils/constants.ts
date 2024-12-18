@@ -399,9 +399,28 @@ const getOllamaBaseUrl = (settings?: IProviderSetting) => {
 };
 
 async function getOllamaModels(apiKeys?: Record<string, string>, settings?: IProviderSetting): Promise<ModelInfo[]> {
-  try {
+    try {
     const baseUrl = getOllamaBaseUrl(settings);
-    const response = await fetch(`${baseUrl}/api/tags`);
+
+     // Check if the API key for Ollama is available
+    const apiKey = apiKeys?.['Ollama'];
+    if (!apiKey) {
+      logger.warn('Clé API pour Ollama manquante');
+      return [];
+    }
+
+    // Prepare headers with authorization
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`, // Use 'Bearer' followed by the API key
+    };
+
+    const response = await fetch(`${baseUrl}/api/tags`, { headers });
+
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP : ${response.status}`);
+    }
+
     const data = (await response.json()) as OllamaApiResponse;
 
     return data.models.map((model: OllamaModel) => ({
@@ -411,8 +430,8 @@ async function getOllamaModels(apiKeys?: Record<string, string>, settings?: IPro
       maxTokenAllowed: 8000,
     }));
   } catch (e: any) {
-    logStore.logError('Failed to get Ollama models', e, { baseUrl: settings?.baseUrl });
-    logger.warn('Failed to get Ollama models: ', e.message || '');
+    logStore.logError('Échec de la récupération des modèles Ollama', e, { baseUrl: settings?.baseUrl });
+    logger.warn('Échec de la récupération des modèles Ollama : ', e.message || '');
 
     return [];
   }
