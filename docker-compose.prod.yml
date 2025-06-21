@@ -12,10 +12,6 @@ services:
     ports:
       - "5173:5173"
 
-    # Variables sensibles regroupées dans un fichier local
-    env_file:
-      - .env.local
-
     # Variables d’environnement spécifiques prod
     environment:
       NODE_ENV: production
