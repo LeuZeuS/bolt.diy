@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  app:
+    image: bolt-ai:production
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: bolt-ai-production
+
+    # Expose l’interface Web
+    ports:
+      - "5173:5173"
+
+    # Variables sensibles regroupées dans un fichier local
+    env_file:
+      - .env.local
+
+    # Variables d’environnement spécifiques prod
+    environment:
+      NODE_ENV: production
+      PORT: 5173
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      HuggingFace_API_KEY: ${HuggingFace_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPEN_ROUTER_API_KEY: ${OPEN_ROUTER_API_KEY}
+      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY}
+      OLLAMA_API_BASE_URL: ${OLLAMA_API_BASE_URL}
+      XAI_API_KEY: ${XAI_API_KEY}
+      TOGETHER_API_KEY: ${TOGETHER_API_KEY}
+      TOGETHER_API_BASE_URL: ${TOGETHER_API_BASE_URL}
+      AWS_BEDROCK_CONFIG: ${AWS_BEDROCK_CONFIG}
+      VITE_LOG_LEVEL: ${VITE_LOG_LEVEL:-debug}
+      DEFAULT_NUM_CTX: ${DEFAULT_NUM_CTX:-32768}
+      RUNNING_IN_DOCKER: "true"
+
+    # Permet aux conteneurs de joindre l’hôte par `host.docker.internal`
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # Lance l’application
+    command: pnpm run dockerstart
+
+    # Redémarre automatiquement en cas de plantage ou reboot
+    restart: unless-stopped
